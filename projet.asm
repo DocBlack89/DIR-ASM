@@ -18,8 +18,9 @@ StrLen      PROTO :DWORD
 
 .DATA
 strCommand db 10,"Pause",13,10,0
-path      db "c:\",0	; sprintf(filename, "C:/../../%s", buffer)
+path      db "D:\Antoine",0	
 search_path	db	"\*",0
+search_path2	db	"\*",0
 
 ; temp	db "c:\Users\antoi\Documents",10
 print db	10," ", 10, 0
@@ -33,6 +34,10 @@ hdl         dd ?
 .CODE
 
 suppresion_etoile:
+	push EBP
+	MOV EBP, ESP
+	SUB ESP, 20
+	
 	mov eax, offset result.cFileName
 	mov ecx, offset path
 	compteur:
@@ -49,40 +54,44 @@ suppresion_etoile:
 			
 			
 path_modif:
-	push MAX_PATH	; 260 bytes
-	call crt_malloc
+	push edx
+	call crt_printf
+	; push MAX_PATH	; 260 bytes
+	; call crt_malloc
 	; mov eax, offset result.cFileName
 	; mov ebx, offset path
 	; push eax
 	; push ebx
 	; call crt_strcat
-	mov edx, eax ; pointer to a 260 bytes buffer
+	; mov edx, eax ; pointer to a 260 bytes buffer
 	push offset result.cFileName
 	push offset path
-	push eax
-	call crt_sprintf
+	call crt_strcat
+	mov ebx, eax
+	push ebx
+	call crt_printf
+	jmp ajout_etoile
+
+	
+ajout_etoile:
+	push offset search_path2
+	push ebx
+	call crt_strcat
+	push ebx
+	call crt_printf
 	jmp debut
 
 					
 start:
-
-  concatenation: 
-	push MAX_PATH	; 260 bytes
-	call crt_malloc
-	mov edx, eax ; pointer to a 260 bytes buffer
+  concatenation:
 	push offset search_path
 	push offset path
+	call crt_strcat
 	push eax
-	call crt_sprintf
-	push edx
 	call crt_printf
 
  debut:
-	push edx
-	call crt_printf
-	mov eax, edx
-	push eax
-	call crt_printf
+
     invoke FindFirstFile, ADDR path, ADDR result
     .IF eax!=INVALID_HANDLE_VALUE
 
@@ -101,7 +110,7 @@ start:
 	mov eax,[result.dwFileAttributes]
     and eax,FILE_ATTRIBUTE_DIRECTORY
     test eax,eax
-    je le_loop
+    je suppresion_etoile
 	
 	
 	; Compare le nom de fichier avec "."
@@ -113,10 +122,7 @@ start:
 	call crt_printf
 	jmp suppresion_etoile
 
-	
 
-	
-	
 jmp le_loop
     .ELSE
    
