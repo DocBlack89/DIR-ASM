@@ -18,7 +18,7 @@ StrLen      PROTO :DWORD
 
 .DATA
 strCommand db 10,"Pause",13,10,0
-path      db "c:\Users\antoi\Documents%s",0	; sprintf(filename, "C:/../../%s", buffer)
+path      db "c:\",0	; sprintf(filename, "C:/../../%s", buffer)
 search_path	db	"\*",0
 
 ; temp	db "c:\Users\antoi\Documents",10
