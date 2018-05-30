@@ -30,11 +30,7 @@ hdl         dd ?
 
 .CODE
 
-suppresion_etoile:
-	push EBP
-	MOV EBP, ESP
-	SUB ESP, 20
-	
+suppresion_etoile:	
 	mov eax, offset result.cFileName
 	mov ecx, offset path
 	compteur:
@@ -72,6 +68,10 @@ path_modif:
 
 	
 start:
+	push ebp
+	mov ebp,esp
+	sub esp, 300
+	mov edx,esp
   concatenation:
 	push offset search_path
 	push offset path
