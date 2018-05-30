@@ -21,10 +21,7 @@ strCommand db 10,"Pause",13,10,0
 path      db "D:\Antoine",0	
 search_path	db	"\*",0
 search_path2	db	"\*",0
-
-; temp	db "c:\Users\antoi\Documents",10
-print db	10," ", 10, 0
-dossier db 10,"C'est un fucking dossier", 0
+doublepoint	db "..",0
 .DATA?
 
 path2     db 256 dup(?)
@@ -64,24 +61,16 @@ path_modif:
 	; push ebx
 	; call crt_strcat
 	; mov edx, eax ; pointer to a 260 bytes buffer
+	push offset search_path2
 	push offset result.cFileName
+	call crt_strcat
+	push eax
 	push offset path
 	call crt_strcat
-	mov ebx, eax
-	push ebx
-	call crt_printf
-	jmp ajout_etoile
-
-	
-ajout_etoile:
-	push offset search_path2
-	push ebx
-	call crt_strcat
-	push ebx
-	call crt_printf
+	push eax
 	jmp debut
 
-					
+	
 start:
   concatenation:
 	push offset search_path
@@ -101,10 +90,21 @@ start:
         invoke FindNextFile, hdl, ADDR result
         cmp eax, 0
         je fini
-		push offset print
-		call crt_printf
 		invoke crt_printf, ADDR result.cFileName
-	
+
+		
+	; Compare le nom de fichier avec "."
+    mov eax,DWORD PTR [result.cFileName]
+    cmp eax,00002E2Eh
+    je le_loop
+		
+    ; Compare le nom de fichier avec ".."
+    push offset doublepoint
+    push offset result.cFileName
+    call crt_wcsncmp
+    add esp,12
+    cmp eax,0
+    je le_loop
 	
 	; test si un dossier
 	mov eax,[result.dwFileAttributes]
@@ -113,10 +113,6 @@ start:
     je suppresion_etoile
 	
 	
-	; Compare le nom de fichier avec "."
-    mov eax,DWORD PTR [result.cFileName]
-    cmp eax,00002E2Eh
-    je le_loop
 
 	
 	call crt_printf
